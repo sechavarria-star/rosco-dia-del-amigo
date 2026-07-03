@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Rosco de la Amistad · HP Argentina</title>
+<style>
+  :root{
+    --hp-blue:#024AD8;
+    --hp-coral:#FF5050;
+    --hp-storm:#568393;
+    --bg:#060e2c;
+    --panel:#0d1a4a;
+    --panel-2:#122258;
+    --ink:#f4f7ff;
+    --muted:#9fb0d8;
+    --ok:#2ec06f;
+    --bad:#FF5050;
+    --pass:#f5b301;
+    --celeste:#75AADB;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    font-family:"HP Simplified","Segoe UI",system-ui,-apple-system,sans-serif;
+    background:radial-gradient(1200px 700px at 70% -10%, #12245f 0%, var(--bg) 55%) fixed;
+    color:var(--ink);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* ===== Header ===== */
+  header{
+    display:flex;align-items:center;gap:16px;
+    padding:14px 26px 10px;
+  }
+  .logo-badge{
+    background:#fff;border-radius:12px;padding:7px 10px;
+    display:flex;align-items:center;box-shadow:0 4px 18px rgba(0,0,0,.35);
+  }
+  .logo-badge img{height:34px;display:block;}
+  .titles h1{font-size:clamp(20px,2.6vw,32px);letter-spacing:.5px;line-height:1.1;}
+  .titles h1 em{font-style:normal;color:var(--hp-coral);}
+  .titles p{color:var(--muted);font-size:clamp(11px,1.2vw,14px);margin-top:2px;}
+  .flag-chip{
+    margin-left:auto;display:flex;align-items:center;gap:10px;
+    background:var(--panel);border:1px solid rgba(117,170,219,.35);
+    padding:8px 14px;border-radius:999px;font-size:13px;color:var(--celeste);
+    white-space:nowrap;
+  }
+  .flag-chip .sun{color:#f5b301;}
+  .flag-stripe{
+    height:6px;width:100%;
+    background:linear-gradient(90deg,var(--celeste) 0 33%,#fff 33% 66%,var(--celeste) 66% 100%);
+    opacity:.85;
+  }
+
+  /* ===== Screens ===== */
+  .screen{display:none;padding:18px 26px 26px;}
+  .screen.active{display:block;}
+
+  /* ===== Start screen ===== */
+  #start .wrap{
+    max-width:1040px;margin:2vh auto 0;display:grid;
+    grid-template-columns:1.2fr .8fr;gap:26px;align-items:start;
+  }
+  .card{
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid rgba(86,131,147,.35);
+    border-radius:20px;padding:26px;box-shadow:0 12px 40px rgba(0,0,0,.35);
+  }
+  .card h2{font-size:22px;margin-bottom:6px;}
+  .card .sub{color:var(--muted);font-size:14px;margin-bottom:18px;line-height:1.45;}
+  label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;letter-spacing:.4px;}
+  input[type=text]{
+    width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(117,170,219,.4);
+    background:#0a153c;color:var(--ink);font-size:16px;outline:none;
+  }
+  input[type=text]:focus{border-color:var(--hp-blue);box-shadow:0 0 0 3px rgba(2,74,216,.3);}
+  .set-picker{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .set-opt{
+    border:2px solid rgba(117,170,219,.35);border-radius:14px;padding:14px;cursor:pointer;
+    background:#0a153c;transition:.15s;
+  }
+  .set-opt:hover{border-color:var(--celeste);}
+  .set-opt.sel{border-color:var(--hp-coral);background:#14235f;box-shadow:0 0 0 3px rgba(255,80,80,.2);}
+  .set-opt b{display:block;font-size:16px;margin-bottom:4px;}
+  .set-opt span{font-size:12.5px;color:var(--muted);line-height:1.35;display:block;}
+  .btn{
+    border:none;border-radius:14px;cursor:pointer;font-family:inherit;
+    font-size:17px;font-weight:700;letter-spacing:.5px;padding:14px 26px;color:#fff;
+    transition:.15s;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-play{
+    width:100%;margin-top:22px;font-size:20px;padding:16px;
+    background:linear-gradient(135deg,var(--hp-coral),#e03737);
+    box-shadow:0 10px 28px rgba(255,80,80,.35);
+  }
+  .btn-play:hover{filter:brightness(1.08);}
+  .keys{margin-top:18px;font-size:12.5px;color:var(--muted);line-height:1.9;}
+  .keys kbd{
+    background:#0a153c;border:1px solid rgba(117,170,219,.4);border-bottom-width:2.5px;
+    border-radius:6px;padding:1.5px 7px;font-family:inherit;font-size:11.5px;color:var(--ink);
+  }
+  #ranking table{width:100%;border-collapse:collapse;font-size:14px;}
+  #ranking th{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;text-align:left;padding:6px 8px;border-bottom:1px solid rgba(117,170,219,.25);}
+  #ranking td{padding:8px;border-bottom:1px solid rgba(117,170,219,.12);}
+  #ranking tr td:first-child{color:var(--pass);font-weight:700;}
+  .rk-ok{color:var(--ok);font-weight:700;}
+  .rk-bad{color:var(--bad);font-weight:700;}
+  .empty-rk{color:var(--muted);font-size:14px;padding:12px 4px;}
+
+  /* ===== Game screen ===== */
+  #game .layout{
+    display:grid;grid-template-columns:minmax(420px,1fr) minmax(360px,.9fr);
+    gap:10px;align-items:center;max-width:1500px;margin:0 auto;
+  }
+  /* Wheel */
+  .wheel-box{display:flex;justify-content:center;}
+  #wheel{
+    position:relative;
+    width:min(76vh,46vw,720px);height:min(76vh,46vw,720px);
+  }
+  .letter{
+    position:absolute;display:flex;align-items:center;justify-content:center;
+    width:9.5%;height:9.5%;border-radius:50%;
+    font-weight:800;font-size:clamp(14px,2.6vh,26px);
+    background:var(--hp-blue);color:#fff;
+    border:2.5px solid rgba(255,255,255,.25);
+    box-shadow:0 4px 12px rgba(0,0,0,.4);
+    transform:translate(-50%,-50%);
+    transition:background .2s,transform .2s,box-shadow .2s;
+    user-select:none;
+  }
+  .letter.pass{background:#0a3d9e;border-color:var(--pass);color:var(--pass);}
+  .letter.ok{background:var(--ok);border-color:#7fe3ad;color:#03301a;}
+  .letter.bad{background:var(--bad);border-color:#ffb3b3;color:#4d0505;}
+  .letter.cur{
+    background:#fff;color:var(--hp-blue);border-color:var(--hp-coral);
+    transform:translate(-50%,-50%) scale(1.38);
+    box-shadow:0 0 0 6px rgba(255,80,80,.35),0 6px 22px rgba(0,0,0,.5);
+    z-index:5;
+    animation:pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 6px rgba(255,80,80,.35),0 6px 22px rgba(0,0,0,.5);}
+    50%{box-shadow:0 0 0 11px rgba(255,80,80,.15),0 6px 22px rgba(0,0,0,.5);}
+  }
+  /* Center of wheel */
+  .hub{
+    position:absolute;inset:22%;border-radius:50%;
+    background:radial-gradient(circle at 50% 32%,#16307c,#0a153c 75%);
+    border:1px solid rgba(117,170,219,.35);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1vh;
+    box-shadow:inset 0 0 40px rgba(0,0,0,.5);
+    text-align:center;
+  }
+  #clock{
+    font-size:clamp(38px,9vh,84px);font-weight:800;letter-spacing:2px;
+    font-variant-numeric:tabular-nums;line-height:1;
+  }
+  #clock.low{color:var(--hp-coral);animation:blink .55s steps(2) infinite;}
+  @keyframes blink{50%{opacity:.45;}}
+  .hub .counts{display:flex;gap:2.4vh;font-size:clamp(16px,3vh,26px);font-weight:800;}
+  .hub .counts .c-ok{color:var(--ok);}
+  .hub .counts .c-bad{color:var(--bad);}
+  .hub .player-tag{font-size:clamp(11px,1.7vh,15px);color:var(--muted);max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* Right panel */
+  .qpanel{display:flex;flex-direction:column;gap:14px;min-width:0;}
+  .defcard{
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid rgba(86,131,147,.35);border-radius:20px;
+    padding:22px 24px;min-height:220px;box-shadow:0 12px 40px rgba(0,0,0,.35);
+  }
+  .def-tag{
+    display:inline-block;background:var(--hp-blue);color:#fff;font-weight:800;
+    border-radius:999px;padding:7px 16px;font-size:clamp(14px,1.6vw,18px);letter-spacing:.6px;
+    margin-bottom:14px;
+  }
+  .def-tag.contiene{background:var(--hp-storm);}
+  #deftext{font-size:clamp(19px,2.1vw,29px);line-height:1.4;min-height:3em;}
+  .answer-row{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  #answer{
+    font-size:clamp(20px,2.2vw,30px);font-weight:800;letter-spacing:2.5px;
+    color:var(--pass);min-height:1.2em;
+  }
+  #answer.revealed-ok{color:var(--ok);}
+  #answer.revealed-bad{color:var(--bad);}
+  .btn-eye{
+    background:#0a153c;border:1px solid rgba(117,170,219,.4);color:var(--muted);
+    font-size:12.5px;padding:7px 13px;border-radius:999px;font-weight:600;
+  }
+  .btn-eye:hover{color:var(--ink);border-color:var(--celeste);}
+  .controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  .btn-ok{background:linear-gradient(135deg,#2ec06f,#1a9b54);box-shadow:0 8px 22px rgba(46,192,111,.3);}
+  .btn-bad{background:linear-gradient(135deg,#FF5050,#d63030);box-shadow:0 8px 22px rgba(255,80,80,.3);}
+  .btn-pass{background:linear-gradient(135deg,#f5b301,#d99a00);color:#3a2a00;box-shadow:0 8px 22px rgba(245,179,1,.3);}
+  .controls .btn{font-size:clamp(14px,1.5vw,19px);padding:16px 8px;}
+  .controls .btn small{display:block;font-size:11px;font-weight:600;opacity:.75;margin-top:3px;letter-spacing:.4px;}
+  .subcontrols{display:flex;gap:10px;justify-content:space-between;align-items:center;}
+  .btn-ghost{
+    background:#0a153c;border:1px solid rgba(117,170,219,.4);color:var(--muted);
+    font-size:13px;padding:9px 16px;font-weight:600;
+  }
+  .btn-ghost:hover{color:var(--ink);border-color:var(--celeste);}
+
+  /* Pause overlay */
+  #pauseOverlay{
+    position:fixed;inset:0;background:rgba(4,9,30,.88);backdrop-filter:blur(4px);
+    display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;z-index:50;
+  }
+  #pauseOverlay.on{display:flex;}
+  #pauseOverlay h2{font-size:46px;letter-spacing:2px;}
+  #pauseOverlay p{color:var(--muted);}
+
+  /* ===== Final screen ===== */
+  #final .wrap{max-width:760px;margin:4vh auto 0;text-align:center;}
+  #final h2{font-size:clamp(28px,4vw,44px);margin-bottom:8px;}
+  #final .who{color:var(--celeste);font-size:20px;margin-bottom:24px;}
+  .score-row{display:flex;justify-content:center;gap:18px;margin:26px 0;flex-wrap:wrap;}
+  .score-box{
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid rgba(86,131,147,.35);border-radius:18px;padding:20px 30px;min-width:150px;
+  }
+  .score-box .num{font-size:44px;font-weight:800;line-height:1;}
+  .score-box .lbl{color:var(--muted);font-size:13px;margin-top:6px;letter-spacing:.6px;text-transform:uppercase;}
+  .score-box.sb-ok .num{color:var(--ok);}
+  .score-box.sb-bad .num{color:var(--bad);}
+  .score-box.sb-time .num{color:var(--celeste);}
+  #finalMsg{font-size:19px;color:var(--muted);line-height:1.5;margin-bottom:30px;}
+  .final-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .btn-blue{background:linear-gradient(135deg,var(--hp-blue),#0135a0);box-shadow:0 8px 22px rgba(2,74,216,.35);}
+
+  /* Confetti */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:60;}
+
+  footer{
+    text-align:center;color:var(--muted);font-size:11.5px;padding:10px 0 16px;letter-spacing:.4px;
+  }
+
+  @media (max-width:980px){
+    #start .wrap{grid-template-columns:1fr;}
+    #game .layout{grid-template-columns:1fr;}
+    #wheel{width:min(88vw,480px);height:min(88vw,480px);}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-badge"><img src="assets/hp-logo.png" alt="HP"></div>
+  <div class="titles">
+    <h1>El Rosco de la <em>Amistad</em></h1>
+    <p>Especial Día del Amigo · Edición 9 de Julio · HP Argentina</p>
+  </div>
+  <div class="flag-chip"><span class="sun">☀</span> 9 de Julio · Día de la Independencia 🇦🇷</div>
+</header>
+<div class="flag-stripe"></div>
+
+<!-- ================= START ================= -->
+<section id="start" class="screen active">
+  <div class="wrap">
+    <div class="card">
+      <h2>🎉 ¡A jugar!</h2>
+      <p class="sub">Estilo Pasapalabra: se proyecta el rosco, el conductor lee las definiciones y el jugador (o equipo) responde de viva voz. El conductor marca <b style="color:var(--ok)">acierto</b>, <b style="color:var(--bad)">error</b> o <b style="color:var(--pass)">pasapalabra</b>. Hay <b>2:30</b> en el reloj.</p>
+
+      <label>Jugador / equipo</label>
+      <input type="text" id="playerName" placeholder="Ej.: Los Próceres de la Amistad" maxlength="40" autocomplete="off">
+
+      <label>Elegí el rosco</label>
+      <div class="set-picker" id="setPicker">
+        <div class="set-opt sel" data-set="0">
+          <b>🩵 Rosco Celeste</b>
+          <span>Amistad, mates, locro y la Declaración de la Independencia.</span>
+        </div>
+        <div class="set-opt" data-set="1">
+          <b>🤍 Rosco Blanco</b>
+          <span>Otras 27 palabras: asado, escarapela, truco y amigos de la vida.</span>
+        </div>
+      </div>
+
+      <button class="btn btn-play" id="btnPlay">▶ &nbsp;EMPEZAR EL ROSCO</button>
+
+      <div class="keys">
+        Atajos para el conductor: &nbsp;
+        <kbd>A</kbd> o <kbd>↑</kbd> acierto &nbsp;·&nbsp;
+        <kbd>E</kbd> o <kbd>↓</kbd> error &nbsp;·&nbsp;
+        <kbd>Espacio</kbd> o <kbd>→</kbd> pasapalabra &nbsp;·&nbsp;
+        <kbd>V</kbd> ver respuesta &nbsp;·&nbsp;
+        <kbd>P</kbd> pausa
+      </div>
+    </div>
+
+    <div class="card" id="ranking">
+      <h2>🏆 Tabla del día</h2>
+      <p class="sub">Los puntajes quedan guardados en esta compu.</p>
+      <div id="rankingBody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GAME ================= -->
+<section id="game" class="screen">
+  <div class="layout">
+    <div class="wheel-box">
+      <div id="wheel">
+        <div class="hub">
+          <div id="clock">2:30</div>
+          <div class="counts"><span class="c-ok">✔ <span id="cntOk">0</span></span><span class="c-bad">✘ <span id="cntBad">0</span></span></div>
+          <div class="player-tag" id="playerTag"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qpanel">
+      <div class="defcard">
+        <span class="def-tag" id="defTag">EMPIEZA CON LA A</span>
+        <div id="deftext">…</div>
+        <div class="answer-row">
+          <span id="answer"></span>
+          <button class="btn btn-eye" id="btnEye">👁 Ver respuesta (V)</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-ok" id="btnOk">✔ ACIERTO<small>tecla A / ↑</small></button>
+        <button class="btn btn-bad" id="btnBad">✘ ERROR<small>tecla E / ↓</small></button>
+        <button class="btn btn-pass" id="btnPass">¡PASAPALABRA!<small>espacio / →</small></button>
+      </div>
+
+      <div class="subcontrols">
+        <button class="btn btn-ghost" id="btnPause">⏸ Pausa (P)</button>
+        <button class="btn btn-ghost" id="btnSound">🔊 Sonido</button>
+        <button class="btn btn-ghost" id="btnQuit">✖ Terminar rosco</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FINAL ================= -->
+<section id="final" class="screen">
+  <div class="wrap">
+    <h2 id="finalTitle">¡Rosco terminado!</h2>
+    <div class="who" id="finalWho"></div>
+    <div class="score-row">
+      <div class="score-box sb-ok"><div class="num" id="fOk">0</div><div class="lbl">Aciertos</div></div>
+      <div class="score-box sb-bad"><div class="num" id="fBad">0</div><div class="lbl">Errores</div></div>
+      <div class="score-box"><div class="num" id="fPend">0</div><div class="lbl">Sin responder</div></div>
+      <div class="score-box sb-time"><div class="num" id="fTime">0:00</div><div class="lbl">Tiempo restante</div></div>
+    </div>
+    <p id="finalMsg"></p>
+    <div class="final-btns">
+      <button class="btn btn-blue" id="btnAgain">🔄 Jugar otro rosco</button>
+      <button class="btn btn-ghost" id="btnHome">🏠 Volver al inicio</button>
+    </div>
+  </div>
+</section>
+
+<div id="pauseOverlay">
+  <h2>⏸ PAUSA</h2>
+  <p>Tocá <b>P</b> o el botón para seguir. El reloj está detenido.</p>
+  <button class="btn btn-blue" id="btnResume">▶ Reanudar</button>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<footer>HP Argentina · Work &amp; Fun '26 · Feliz Día del Amigo 💙</footer>
+
+<script>
+/* =========================================================
+   DATOS — 2 roscos de 27 letras (A–Z con Ñ).
+   tipo: "empieza" | "contiene"
+   ========================================================= */
+const ROSCOS = [
+ { nombre:"Rosco Celeste", letras:[
+  {l:"A",t:"empieza", d:"Vínculo de cariño y confianza entre personas que se eligen mutuamente.", r:"AMISTAD"},
+  {l:"B",t:"empieza", d:"Levantar la copa y chocarla con amigos para celebrar, por ejemplo, el Día del Amigo.", r:"BRINDIS"},
+  {l:"C",t:"empieza", d:"Lo que un buen amigo nunca traiciona: la seguridad de que se puede contar con él.", r:"CONFIANZA"},
+  {l:"D",t:"empieza", d:"La de la Independencia argentina se firmó un 9 de julio de 1816.", r:"DECLARACIÓN"},
+  {l:"E",t:"empieza", d:"Comida típica infaltable en toda celebración patria; puede ser de carne, pollo o humita.", r:"EMPANADA"},
+  {l:"F",t:"empieza", d:"Día no laborable, como cada 9 de julio en Argentina.", r:"FERIADO"},
+  {l:"G",t:"empieza", d:"Conjunto de amigos; el de WhatsApp no para de sonar nunca.", r:"GRUPO"},
+  {l:"H",t:"empieza", d:"Canción patria que los argentinos cantan con la mano en el corazón.", r:"HIMNO"},
+  {l:"I",t:"empieza", d:"Lo que Argentina declaró en San Miguel de Tucumán en 1816.", r:"INDEPENDENCIA"},
+  {l:"J",t:"empieza", d:"Reunión informal de amigos para comer, charlar y ponerse al día.", r:"JUNTADA"},
+  {l:"K",t:"empieza", d:"Actividad de cantar éxitos con micrófono entre amigos, aunque se desafine.", r:"KARAOKE"},
+  {l:"L",t:"empieza", d:"Guiso criollo a base de maíz y zapallo que se come en las fiestas patrias.", r:"LOCRO"},
+  {l:"M",t:"empieza", d:"Infusión que se comparte en ronda y es símbolo de la amistad argentina.", r:"MATE"},
+  {l:"N",t:"empieza", d:"Día del mes de julio en que se celebra la Independencia argentina.", r:"NUEVE"},
+  {l:"Ñ",t:"contiene",d:"Persona con la que se comparte el día a día del trabajo o del estudio.", r:"COMPAÑERO"},
+  {l:"O",t:"empieza", d:"Lugar de trabajo donde nacen muchas grandes amistades.", r:"OFICINA"},
+  {l:"P",t:"empieza", d:"Tierra donde uno nace; a la argentina se la celebra cada 9 de julio.", r:"PATRIA"},
+  {l:"Q",t:"empieza", d:"Infaltable en toda picada entre amigos; puede venir en cubitos con salamín.", r:"QUESO"},
+  {l:"R",t:"empieza", d:"Lo que un buen amigo garantiza con un solo chiste interno.", r:"RISA"},
+  {l:"S",t:"empieza", d:"Figura dorada que brilla en el centro de la bandera argentina.", r:"SOL"},
+  {l:"T",t:"empieza", d:"Provincia donde se declaró la Independencia el 9 de julio de 1816.", r:"TUCUMÁN"},
+  {l:"U",t:"empieza", d:"Lo que celebra el Día del Amigo: estar juntos aunque pase el tiempo.", r:"UNIÓN"},
+  {l:"V",t:"empieza", d:"Bebida clásica del brindis; la insignia nacional es el malbec.", r:"VINO"},
+  {l:"W",t:"empieza", d:"Aplicación donde vive el grupo de amigos y sus audios de diez minutos.", r:"WHATSAPP"},
+  {l:"X",t:"contiene",d:"Resultado feliz de un proyecto encarado en equipo.", r:"ÉXITO"},
+  {l:"Y",t:"empieza", d:"Lo que se da de más, de regalo, como el alfajor extra que te convida un amigo.", r:"YAPA"},
+  {l:"Z",t:"contiene",d:"Gesto de cariño que se da con los dos brazos al reencontrarse con un amigo.", r:"ABRAZO"},
+ ]},
+ { nombre:"Rosco Blanco", letras:[
+  {l:"A",t:"empieza", d:"Comida que une a los argentinos alrededor de la parrilla un domingo.", r:"ASADO"},
+  {l:"B",t:"empieza", d:"La argentina es celeste y blanca y fue creada por Manuel Belgrano.", r:"BANDERA"},
+  {l:"C",t:"empieza", d:"Amigo al que se le confían los secretos más guardados.", r:"CONFIDENTE"},
+  {l:"D",t:"empieza", d:"Lo que nunca falta cuando se junta un buen grupo de amigos.", r:"DIVERSIÓN"},
+  {l:"E",t:"empieza", d:"Distintivo celeste y blanco que se prende en el pecho en las fechas patrias.", r:"ESCARAPELA"},
+  {l:"F",t:"empieza", d:"Deporte que junta amigos todas las semanas, aunque el equipo pierda siempre.", r:"FÚTBOL"},
+  {l:"G",t:"empieza", d:"Instrumento infaltable en todo fogón entre amigos.", r:"GUITARRA"},
+  {l:"H",t:"empieza", d:"Se dice del amigo que es \"de la vida\": uno que se vuelve familia.", r:"HERMANO"},
+  {l:"I",t:"empieza", d:"Se dice de los amigos que van juntos a todas partes.", r:"INSEPARABLES"},
+  {l:"J",t:"empieza", d:"Mes del año en que se celebran la Independencia y el Día del Amigo.", r:"JULIO"},
+  {l:"K",t:"empieza", d:"Comercio de barrio donde se compran los alfajores para compartir.", r:"KIOSCO"},
+  {l:"L",t:"empieza", d:"Valor del amigo que siempre está, en las buenas y en las malas.", r:"LEALTAD"},
+  {l:"M",t:"empieza", d:"Factura en forma de luna que un buen amigo trae al desayuno.", r:"MEDIALUNA"},
+  {l:"N",t:"empieza", d:"Sentimiento que despiertan las fotos viejas con amigos.", r:"NOSTALGIA"},
+  {l:"Ñ",t:"contiene",d:"Reunión folclórica con guitarra, canto y empanadas.", r:"PEÑA"},
+  {l:"O",t:"empieza", d:"Monumento porteño ubicado sobre la avenida más ancha del mundo, la 9 de Julio.", r:"OBELISCO"},
+  {l:"P",t:"empieza", d:"Tabla de fiambres y quesos que se comparte entre amigos.", r:"PICADA"},
+  {l:"Q",t:"empieza", d:"Lo que hay entre dos amigos que se entienden sin hablar.", r:"QUÍMICA"},
+  {l:"R",t:"empieza", d:"Encuentro con amigos que hacía mucho tiempo no se veían.", r:"REENCUENTRO"},
+  {l:"S",t:"empieza", d:"Lo que se le cuenta a un amigo y no puede salir de ahí.", r:"SECRETO"},
+  {l:"T",t:"empieza", d:"Juego de cartas bien argentino en el que mentir vale... ¡quiero retruco!", r:"TRUCO"},
+  {l:"U",t:"empieza", d:"Etapa de estudio en la que se hacen amigos para toda la vida.", r:"UNIVERSIDAD"},
+  {l:"V",t:"empieza", d:"Plan soñado de todo grupo de amigos, aunque cueste ponerle fecha.", r:"VIAJE"},
+  {l:"W",t:"contiene",d:"El de miga es infaltable en los cumpleaños de la oficina.", r:"SÁNDWICH"},
+  {l:"X",t:"contiene",d:"Salida en grupo para pasar el día al aire libre.", r:"EXCURSIÓN"},
+  {l:"Y",t:"contiene",d:"Cantor criollo que improvisa versos con su guitarra.", r:"PAYADOR"},
+  {l:"Z",t:"contiene",d:"Ahí es donde, dicen, se guardan los amigos de verdad.", r:"CORAZÓN"},
+ ]},
+];
+
+const TIEMPO_TOTAL = 150; // 2:30
+
+/* ============== Estado ============== */
+let setIdx = 0, player = "";
+let estado = [];        // "pend" | "ok" | "bad"  (pasapalabra sigue "pend" con flag)
+let pasadas = [];       // marca visual de pasapalabra
+let cur = -1;
+let tiempo = TIEMPO_TOTAL;
+let timerId = null;
+let jugando = false, enPausa = false, lock = false;
+let soundOn = true;
+let revealTimeout = null;
+
+const $ = id => document.getElementById(id);
+const screens = {start:$("start"), game:$("game"), final:$("final")};
+function show(name){
+  Object.values(screens).forEach(s=>s.classList.remove("active"));
+  screens[name].classList.add("active");
+}
+
+/* ============== Sonido (WebAudio, sin archivos) ============== */
+let actx = null;
+function beep(freqs, dur=0.12, type="sine", gain=0.12){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(gain, actx.currentTime + i*dur);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + (i+1)*dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(actx.currentTime + i*dur); o.stop(actx.currentTime + (i+1)*dur + 0.02);
+    });
+  }catch(e){}
+}
+const sndOk   = ()=>beep([660,880],0.11,"sine",0.14);
+const sndBad  = ()=>beep([220,165],0.16,"square",0.07);
+const sndPass = ()=>beep([440],0.09,"sine",0.09);
+const sndFin  = ()=>beep([523,659,784,1046],0.14,"sine",0.13);
+
+/* ============== Rueda ============== */
+function buildWheel(){
+  document.querySelectorAll("#wheel .letter").forEach(n=>n.remove());
+  const letras = ROSCOS[setIdx].letras;
+  const n = letras.length;
+  letras.forEach((item,i)=>{
+    const ang = (i/n)*2*Math.PI - Math.PI/2;
+    const x = 50 + 45.2*Math.cos(ang);
+    const y = 50 + 45.2*Math.sin(ang);
+    const el = document.createElement("div");
+    el.className = "letter";
+    el.id = "L"+i;
+    el.style.left = x+"%";
+    el.style.top  = y+"%";
+    el.textContent = item.l;
+    $("wheel").appendChild(el);
+  });
+}
+function paintWheel(){
+  ROSCOS[setIdx].letras.forEach((_,i)=>{
+    const el = $("L"+i);
+    el.className = "letter";
+    if(estado[i]==="ok") el.classList.add("ok");
+    else if(estado[i]==="bad") el.classList.add("bad");
+    else if(pasadas[i]) el.classList.add("pass");
+    if(i===cur && jugando) el.classList.add("cur");
+  });
+}
+
+/* ============== Juego ============== */
+function nextPending(from){
+  const n = estado.length;
+  for(let k=1;k<=n;k++){
+    const i = (from+k)%n;
+    if(estado[i]==="pend") return i;
+  }
+  return -1;
+}
+function fmt(s){ return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+
+function startGame(){
+  player = $("playerName").value.trim() || "Equipo sin nombre";
+  const n = ROSCOS[setIdx].letras.length;
+  estado = Array(n).fill("pend");
+  pasadas = Array(n).fill(false);
+  tiempo = TIEMPO_TOTAL;
+  cur = 0; jugando = true; enPausa = false; lock = false;
+  buildWheel();
+  $("playerTag").textContent = player;
+  $("cntOk").textContent = 0; $("cntBad").textContent = 0;
+  updateClock();
+  show("game");
+  showQuestion();
+  clearInterval(timerId);
+  timerId = setInterval(tick,1000);
+}
+function tick(){
+  if(enPausa || !jugando) return;
+  tiempo--;
+  updateClock();
+  if(tiempo<=0){ tiempo=0; updateClock(); endGame("⏰ ¡Se acabó el tiempo!"); }
+}
+function updateClock(){
+  const c = $("clock");
+  c.textContent = fmt(tiempo);
+  c.classList.toggle("low", tiempo<=20 && jugando);
+}
+function showQuestion(){
+  const item = ROSCOS[setIdx].letras[cur];
+  const tag = $("defTag");
+  tag.textContent = (item.t==="empieza" ? "EMPIEZA CON LA " : "CONTIENE LA ") + item.l;
+  tag.classList.toggle("contiene", item.t==="contiene");
+  $("deftext").textContent = item.d;
+  const a = $("answer");
+  a.textContent = ""; a.className = "";
+  paintWheel();
+}
+function mark(res){ // "ok" | "bad"
+  if(!jugando || enPausa || lock || cur<0) return;
+  lock = true;
+  estado[cur] = res;
+  if(res==="ok"){ $("cntOk").textContent = +$("cntOk").textContent+1; sndOk(); }
+  else{ $("cntBad").textContent = +$("cntBad").textContent+1; sndBad(); }
+  const a = $("answer");
+  a.textContent = ROSCOS[setIdx].letras[cur].r;
+  a.className = res==="ok" ? "revealed-ok" : "revealed-bad";
+  paintWheel();
+  revealTimeout = setTimeout(()=>{
+    lock = false;
+    const nxt = nextPending(cur);
+    if(nxt<0){ endGame("🎯 ¡Rosco completo!"); return; }
+    cur = nxt; showQuestion();
+  }, 1300);
+}
+function pass(){
+  if(!jugando || enPausa || lock || cur<0) return;
+  const nxt = nextPending(cur);
+  if(nxt<0 || nxt===cur){ sndPass(); return; }
+  pasadas[cur] = true;
+  sndPass();
+  cur = nxt; showQuestion();
+}
+function togglePause(){
+  if(!jugando) return;
+  enPausa = !enPausa;
+  $("pauseOverlay").classList.toggle("on", enPausa);
+}
+function revealAnswer(){
+  if(!jugando || cur<0) return;
+  const a = $("answer");
+  if(a.textContent){ a.textContent=""; a.className=""; }
+  else{ a.textContent = ROSCOS[setIdx].letras[cur].r; a.className=""; }
+}
+function endGame(titulo){
+  if(!jugando) return;
+  jugando = false;
+  clearInterval(timerId);
+  clearTimeout(revealTimeout);
+  $("pauseOverlay").classList.remove("on");
+  const ok = +$("cntOk").textContent, bad = +$("cntBad").textContent;
+  const pend = estado.filter(e=>e==="pend").length;
+  $("finalTitle").textContent = titulo;
+  $("finalWho").textContent = player + " · " + ROSCOS[setIdx].nombre;
+  $("fOk").textContent = ok; $("fBad").textContent = bad;
+  $("fPend").textContent = pend; $("fTime").textContent = fmt(tiempo);
+  $("finalMsg").innerHTML = mensajeFinal(ok,bad,pend);
+  saveScore(ok,bad);
+  show("final");
+  sndFin();
+  if(ok>=15) confetti();
+}
+function mensajeFinal(ok,bad,pend){
+  if(ok===27) return "🏆 ¡ROSCO PERFECTO! 27 de 27. Ni los congresales de Tucumán firmaron algo tan grande. 🇦🇷";
+  if(ok>=20) return "🥇 ¡Enorme! Un verdadero prócer de la amistad. ¡Feliz Día del Amigo!";
+  if(ok>=13) return "👏 ¡Muy buen rosco! Con amigos así, la patria está en buenas manos.";
+  if(ok>=7)  return "🙂 Digno esfuerzo. La próxima juntada lo charlamos con un mate de por medio.";
+  return "😅 Lo importante no era ganar, era jugar con amigos... ¿otra vuelta?";
+}
+
+/* ============== Ranking (localStorage) ============== */
+const RK_KEY = "rosco-hp-ranking-v1";
+function saveScore(ok,bad){
+  try{
+    const rk = JSON.parse(localStorage.getItem(RK_KEY)||"[]");
+    rk.push({name:player, ok, bad, time:tiempo, set:ROSCOS[setIdx].nombre, ts:Date.now()});
+    localStorage.setItem(RK_KEY, JSON.stringify(rk));
+  }catch(e){}
+}
+function renderRanking(){
+  let rk = [];
+  try{ rk = JSON.parse(localStorage.getItem(RK_KEY)||"[]"); }catch(e){}
+  rk.sort((a,b)=> b.ok-a.ok || a.bad-b.bad || b.time-a.time);
+  const el = $("rankingBody");
+  if(!rk.length){ el.innerHTML = '<div class="empty-rk">Todavía no jugó nadie. ¡Sé el primero! 🚀</div>'; return; }
+  const rows = rk.slice(0,8).map((r,i)=>
+    `<tr><td>${i+1}º</td><td>${escapeHtml(r.name)}</td><td class="rk-ok">✔ ${r.ok}</td><td class="rk-bad">✘ ${r.bad}</td><td>${fmt(r.time)}</td></tr>`
+  ).join("");
+  el.innerHTML = `<table><tr><th>#</th><th>Jugador</th><th>Aciertos</th><th>Errores</th><th>Reloj</th></tr>${rows}</table>`;
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ============== Confetti ============== */
+function confetti(){
+  const cv = $("confetti"), ctx = cv.getContext("2d");
+  cv.width = innerWidth; cv.height = innerHeight;
+  const colors = ["#75AADB","#ffffff","#f5b301","#FF5050","#024AD8"];
+  const parts = Array.from({length:160},()=>({
+    x:Math.random()*cv.width, y:-20-Math.random()*cv.height*0.5,
+    w:6+Math.random()*7, h:8+Math.random()*8,
+    vy:2+Math.random()*3.5, vx:-1.5+Math.random()*3,
+    rot:Math.random()*Math.PI, vr:-0.1+Math.random()*0.2,
+    c:colors[Math.floor(Math.random()*colors.length)]
+  }));
+  let t0 = performance.now();
+  (function frame(t){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    parts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    });
+    if(t-t0<5200) requestAnimationFrame(frame);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  })(t0);
+}
+
+/* ============== Eventos ============== */
+$("setPicker").addEventListener("click", e=>{
+  const opt = e.target.closest(".set-opt"); if(!opt) return;
+  document.querySelectorAll(".set-opt").forEach(o=>o.classList.remove("sel"));
+  opt.classList.add("sel");
+  setIdx = +opt.dataset.set;
+});
+$("btnPlay").onclick = startGame;
+$("btnOk").onclick  = ()=>mark("ok");
+$("btnBad").onclick = ()=>mark("bad");
+$("btnPass").onclick = pass;
+$("btnPause").onclick = togglePause;
+$("btnResume").onclick = togglePause;
+$("btnEye").onclick = revealAnswer;
+$("btnSound").onclick = ()=>{ soundOn=!soundOn; $("btnSound").textContent = soundOn?"🔊 Sonido":"🔇 Silencio"; };
+$("btnQuit").onclick = ()=>{ if(confirm("¿Terminar este rosco?")) endGame("Rosco finalizado"); };
+$("btnAgain").onclick = ()=>{ renderRanking(); show("start"); window.scrollTo(0,0); };
+$("btnHome").onclick  = ()=>{ renderRanking(); show("start"); window.scrollTo(0,0); };
+
+document.addEventListener("keydown", e=>{
+  if(!screens.game.classList.contains("active")) return;
+  if(e.target.tagName==="INPUT") return;
+  const k = e.key.toLowerCase();
+  if(enPausa && k!=="p") return;
+  if(k==="a"||k==="arrowup"){ e.preventDefault(); mark("ok"); }
+  else if(k==="e"||k==="arrowdown"){ e.preventDefault(); mark("bad"); }
+  else if(k===" "||k==="arrowright"){ e.preventDefault(); pass(); }
+  else if(k==="p"){ e.preventDefault(); togglePause(); }
+  else if(k==="v"){ e.preventDefault(); revealAnswer(); }
+});
+
+renderRanking();
+</script>
+</body>
+</html>
