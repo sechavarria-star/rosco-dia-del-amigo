@@ -188,11 +188,13 @@
   }
   #answer.revealed-ok{color:var(--ok);}
   #answer.revealed-bad{color:var(--bad);}
-  .btn-eye{
-    background:#0a153c;border:1px solid rgba(117,170,219,.4);color:var(--muted);
-    font-size:12.5px;padding:7px 13px;border-radius:999px;font-weight:600;
+  .ans-label{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+  .next-row{
+    margin-top:12px;font-size:15px;color:var(--muted);
+    border-top:1px dashed rgba(117,170,219,.25);padding-top:10px;
   }
-  .btn-eye:hover{color:var(--ink);border-color:var(--celeste);}
+  .next-row b{color:var(--celeste);}
+  .next-row .nx-ans{color:var(--ink);font-weight:700;letter-spacing:1.5px;}
   .controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
   .btn-ok{background:linear-gradient(135deg,#2ec06f,#1a9b54);box-shadow:0 8px 22px rgba(46,192,111,.3);}
   .btn-bad{background:linear-gradient(135deg,#FF5050,#d63030);box-shadow:0 8px 22px rgba(255,80,80,.3);}
@@ -235,6 +237,22 @@
 
   /* Confetti */
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:60;}
+
+  /* ===== Modo pantalla pública (?display) ===== */
+  body.display .qpanel,
+  body.display .final-btns,
+  body.display #pauseOverlay .btn{display:none;}
+  body.display #game .layout{grid-template-columns:1fr;justify-items:center;}
+  body.display #wheel{width:min(72vh,92vw,880px);height:min(72vh,92vw,880px);}
+  .defbar{
+    display:none;max-width:980px;margin:16px auto 0;text-align:center;
+    font-size:clamp(16px,2vw,24px);color:var(--ink);line-height:1.4;padding:0 20px;
+  }
+  .defbar .def-tag{margin:0 10px 0 0;font-size:15px;padding:5px 12px;}
+  body.display .defbar.on{display:block;}
+  #wait .wrap{text-align:center;margin-top:16vh;}
+  #wait h2{font-size:clamp(30px,4.5vw,54px);letter-spacing:1px;}
+  #wait p{color:var(--muted);margin-top:14px;font-size:18px;}
 
   footer{
     text-align:center;color:var(--muted);font-size:11.5px;padding:10px 0 16px;letter-spacing:.4px;
@@ -282,14 +300,16 @@
       </div>
 
       <button class="btn btn-play" id="btnPlay">▶ &nbsp;EMPEZAR EL ROSCO</button>
+      <button class="btn btn-ghost" id="btnOpenDisplay" style="width:100%;margin-top:12px;">🖥 Abrir pantalla del público (llevarla al proyector)</button>
 
       <div class="keys">
         Atajos para el conductor: &nbsp;
         <kbd>A</kbd> o <kbd>↑</kbd> acierto &nbsp;·&nbsp;
         <kbd>E</kbd> o <kbd>↓</kbd> error &nbsp;·&nbsp;
         <kbd>Espacio</kbd> o <kbd>→</kbd> pasapalabra &nbsp;·&nbsp;
-        <kbd>V</kbd> ver respuesta &nbsp;·&nbsp;
-        <kbd>P</kbd> pausa
+        <kbd>P</kbd> pausa<br>
+        Esta ventana es la del <b>conductor</b> (muestra las respuestas): no la proyectes.
+        En la pantalla del público, la tecla <kbd>D</kbd> muestra/oculta la definición.
       </div>
     </div>
 
@@ -319,9 +339,10 @@
         <span class="def-tag" id="defTag">EMPIEZA CON LA A</span>
         <div id="deftext">…</div>
         <div class="answer-row">
+          <span class="ans-label">Respuesta:</span>
           <span id="answer"></span>
-          <button class="btn btn-eye" id="btnEye">👁 Ver respuesta (V)</button>
         </div>
+        <div class="next-row">Próxima: <b id="nxTag">—</b> <span class="nx-ans" id="nxAns"></span></div>
       </div>
 
       <div class="controls">
@@ -333,9 +354,19 @@
       <div class="subcontrols">
         <button class="btn btn-ghost" id="btnPause">⏸ Pausa (P)</button>
         <button class="btn btn-ghost" id="btnSound">🔊 Sonido</button>
+        <button class="btn btn-ghost" id="btnDisplay2">🖥 Pantalla pública</button>
         <button class="btn btn-ghost" id="btnQuit">✖ Terminar rosco</button>
       </div>
     </div>
+  </div>
+  <div class="defbar" id="defbar"></div>
+</section>
+
+<!-- ================= WAIT (pantalla del público) ================= -->
+<section id="wait" class="screen">
+  <div class="wrap">
+    <h2>🇦🇷 El Rosco de la Amistad</h2>
+    <p>El juego está por comenzar…</p>
   </div>
 </section>
 
@@ -435,6 +466,7 @@ const ROSCOS = [
 ];
 
 const TIEMPO_TOTAL = 150; // 2:30
+const IS_DISPLAY = new URLSearchParams(location.search).has("display");
 
 /* ============== Estado ============== */
 let setIdx = 0, player = "";
@@ -448,10 +480,30 @@ let soundOn = true;
 let revealTimeout = null;
 
 const $ = id => document.getElementById(id);
-const screens = {start:$("start"), game:$("game"), final:$("final")};
+const screens = {start:$("start"), game:$("game"), final:$("final"), wait:$("wait")};
 function show(name){
   Object.values(screens).forEach(s=>s.classList.remove("active"));
   screens[name].classList.add("active");
+  if(name!=="wait") currentScreen = name;
+  bcast();
+}
+
+/* ============== Sincronización conductor ↔ pantalla pública ============== */
+let bc = null; try{ bc = new BroadcastChannel("rosco-hp"); }catch(e){}
+let displayWin = null, finData = null, currentScreen = "start";
+function snap(){
+  return {roscoHP:true, screen:currentScreen, setIdx, estado, pasadas, cur, tiempo,
+          ok:+$("cntOk").textContent, bad:+$("cntBad").textContent, player, enPausa, fin:finData};
+}
+function bcast(){
+  if(IS_DISPLAY) return;
+  const m = snap();
+  if(bc) bc.postMessage(m);
+  if(displayWin && !displayWin.closed){ try{ displayWin.postMessage(m,"*"); }catch(e){} }
+}
+function openDisplay(){
+  displayWin = window.open(location.pathname+"?display","roscoDisplay");
+  setTimeout(bcast, 800); setTimeout(bcast, 2200);
 }
 
 /* ============== Sonido (WebAudio, sin archivos) ============== */
@@ -535,6 +587,7 @@ function tick(){
   if(enPausa || !jugando) return;
   tiempo--;
   updateClock();
+  bcast();
   if(tiempo<=0){ tiempo=0; updateClock(); endGame("⏰ ¡Se acabó el tiempo!"); }
 }
 function updateClock(){
@@ -549,8 +602,13 @@ function showQuestion(){
   tag.classList.toggle("contiene", item.t==="contiene");
   $("deftext").textContent = item.d;
   const a = $("answer");
-  a.textContent = ""; a.className = "";
+  a.textContent = item.r; a.className = "";
+  const nxt = nextPending(cur);
+  const hayNext = nxt>=0 && nxt!==cur;
+  $("nxTag").textContent = hayNext ? ROSCOS[setIdx].letras[nxt].l : "—";
+  $("nxAns").textContent = hayNext ? ROSCOS[setIdx].letras[nxt].r : "";
   paintWheel();
+  bcast();
 }
 function mark(res){ // "ok" | "bad"
   if(!jugando || enPausa || lock || cur<0) return;
@@ -562,6 +620,7 @@ function mark(res){ // "ok" | "bad"
   a.textContent = ROSCOS[setIdx].letras[cur].r;
   a.className = res==="ok" ? "revealed-ok" : "revealed-bad";
   paintWheel();
+  bcast();
   revealTimeout = setTimeout(()=>{
     lock = false;
     const nxt = nextPending(cur);
@@ -581,12 +640,7 @@ function togglePause(){
   if(!jugando) return;
   enPausa = !enPausa;
   $("pauseOverlay").classList.toggle("on", enPausa);
-}
-function revealAnswer(){
-  if(!jugando || cur<0) return;
-  const a = $("answer");
-  if(a.textContent){ a.textContent=""; a.className=""; }
-  else{ a.textContent = ROSCOS[setIdx].letras[cur].r; a.className=""; }
+  bcast();
 }
 function endGame(titulo){
   if(!jugando) return;
@@ -596,6 +650,7 @@ function endGame(titulo){
   $("pauseOverlay").classList.remove("on");
   const ok = +$("cntOk").textContent, bad = +$("cntBad").textContent;
   const pend = estado.filter(e=>e==="pend").length;
+  finData = {titulo, ok, bad, pend, time:fmt(tiempo), msg:mensajeFinal(ok,bad,pend)};
   $("finalTitle").textContent = titulo;
   $("finalWho").textContent = player + " · " + ROSCOS[setIdx].nombre;
   $("fOk").textContent = ok; $("fBad").textContent = bad;
@@ -674,25 +729,73 @@ $("btnBad").onclick = ()=>mark("bad");
 $("btnPass").onclick = pass;
 $("btnPause").onclick = togglePause;
 $("btnResume").onclick = togglePause;
-$("btnEye").onclick = revealAnswer;
+$("btnOpenDisplay").onclick = openDisplay;
+$("btnDisplay2").onclick = openDisplay;
 $("btnSound").onclick = ()=>{ soundOn=!soundOn; $("btnSound").textContent = soundOn?"🔊 Sonido":"🔇 Silencio"; };
 $("btnQuit").onclick = ()=>{ if(confirm("¿Terminar este rosco?")) endGame("Rosco finalizado"); };
 $("btnAgain").onclick = ()=>{ renderRanking(); show("start"); window.scrollTo(0,0); };
 $("btnHome").onclick  = ()=>{ renderRanking(); show("start"); window.scrollTo(0,0); };
 
 document.addEventListener("keydown", e=>{
+  const k = e.key.toLowerCase();
+  if(IS_DISPLAY){
+    if(k==="d") $("defbar").classList.toggle("on");
+    return;
+  }
   if(!screens.game.classList.contains("active")) return;
   if(e.target.tagName==="INPUT") return;
-  const k = e.key.toLowerCase();
   if(enPausa && k!=="p") return;
   if(k==="a"||k==="arrowup"){ e.preventDefault(); mark("ok"); }
   else if(k==="e"||k==="arrowdown"){ e.preventDefault(); mark("bad"); }
   else if(k===" "||k==="arrowright"){ e.preventDefault(); pass(); }
   else if(k==="p"){ e.preventDefault(); togglePause(); }
-  else if(k==="v"){ e.preventDefault(); revealAnswer(); }
 });
 
-renderRanking();
+/* ============== Arranque: pantalla pública o conductor ============== */
+if(IS_DISPLAY){
+  document.body.classList.add("display");
+  soundOn = false;
+  show("wait");
+  let finFxDone = false;
+  const render = m=>{
+    if(!m || !m.roscoHP || m.hello) return;
+    if(m.screen==="start"){ finFxDone = false; show("wait"); return; }
+    if(m.screen==="final"){
+      if(m.fin){
+        $("finalTitle").textContent = m.fin.titulo;
+        $("finalWho").textContent = m.player + " · " + ROSCOS[m.setIdx].nombre;
+        $("fOk").textContent = m.fin.ok; $("fBad").textContent = m.fin.bad;
+        $("fPend").textContent = m.fin.pend; $("fTime").textContent = m.fin.time;
+        $("finalMsg").innerHTML = m.fin.msg;
+        if(!finFxDone && m.fin.ok>=15) confetti();
+        finFxDone = true;
+      }
+      $("pauseOverlay").classList.remove("on");
+      show("final"); return;
+    }
+    finFxDone = false;
+    if(setIdx!==m.setIdx || !$("L0")){ setIdx = m.setIdx; buildWheel(); }
+    estado = m.estado; pasadas = m.pasadas; cur = m.cur; tiempo = m.tiempo; jugando = true;
+    $("cntOk").textContent = m.ok; $("cntBad").textContent = m.bad;
+    $("playerTag").textContent = m.player;
+    updateClock(); paintWheel();
+    const it = ROSCOS[m.setIdx].letras[m.cur];
+    $("defbar").innerHTML = '<span class="def-tag'+(it.t==="contiene"?" contiene":"")+'">'+
+      (it.t==="empieza"?"EMPIEZA CON LA ":"CONTIENE LA ")+it.l+'</span> '+escapeHtml(it.d);
+    enPausa = !!m.enPausa;
+    $("pauseOverlay").classList.toggle("on", enPausa);
+    if(!screens.game.classList.contains("active")) show("game");
+  };
+  if(bc) bc.onmessage = e=>render(e.data);
+  window.addEventListener("message", e=>render(e.data));
+  // avisar que la pantalla está lista para recibir el estado actual
+  if(bc) bc.postMessage({roscoHP:true, hello:true});
+  if(window.opener){ try{ window.opener.postMessage({roscoHP:true, hello:true},"*"); }catch(e){} }
+}else{
+  if(bc) bc.onmessage = e=>{ if(e.data && e.data.hello) bcast(); };
+  window.addEventListener("message", e=>{ if(e.data && e.data.roscoHP && e.data.hello) bcast(); });
+  renderRanking();
+}
 </script>
 </body>
 </html>
