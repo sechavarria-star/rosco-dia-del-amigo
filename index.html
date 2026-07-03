@@ -317,6 +317,7 @@
       <h2>🏆 Tabla del día</h2>
       <p class="sub">Los puntajes quedan guardados en esta compu.</p>
       <div id="rankingBody"></div>
+      <button class="btn btn-ghost" id="btnClearRk" style="margin-top:16px;">🗑 Borrar resultados</button>
     </div>
   </div>
 </section>
@@ -733,6 +734,12 @@ $("btnOpenDisplay").onclick = openDisplay;
 $("btnDisplay2").onclick = openDisplay;
 $("btnSound").onclick = ()=>{ soundOn=!soundOn; $("btnSound").textContent = soundOn?"🔊 Sonido":"🔇 Silencio"; };
 $("btnQuit").onclick = ()=>{ if(confirm("¿Terminar este rosco?")) endGame("Rosco finalizado"); };
+$("btnClearRk").onclick = ()=>{
+  if(confirm("¿Borrar todos los resultados de la Tabla del día?")){
+    localStorage.removeItem(RK_KEY);
+    renderRanking();
+  }
+};
 $("btnAgain").onclick = ()=>{ renderRanking(); show("start"); window.scrollTo(0,0); };
 $("btnHome").onclick  = ()=>{ renderRanking(); show("start"); window.scrollTo(0,0); };
 
