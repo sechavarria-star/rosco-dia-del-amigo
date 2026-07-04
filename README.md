@@ -10,8 +10,9 @@ Hay dos vistas sincronizadas en vivo (sin backend, via BroadcastChannel/postMess
 - **Ventana del conductor** (`index.html`): definiciones, la **respuesta correcta siempre
   visible**, la próxima letra con su respuesta en chico, y los botones de marcado.
   ⚠️ Esta ventana NO se proyecta.
-- **Pantalla del público** (`index.html?display`): solo el rosco gigante con los KPIs
-  (reloj, aciertos, errores). Es la que va al proyector/TV.
+- **Pantalla del público** (`index.html?display`): el rosco gigante con los KPIs
+  (reloj, aciertos, errores) y la definición actual debajo (nunca la respuesta).
+  Es la que va al proyector/TV.
 
 Pasos:
 
@@ -29,8 +30,8 @@ Pasos:
    | Pasapalabra | amarillo | `Espacio` o `→` |
    | Pausa | ⏸ | `P` |
 
-   En la pantalla del público, la tecla `D` muestra/oculta la definición actual (sin la
-   respuesta) por si quieren que la audiencia la lea.
+   La pantalla del público muestra la definición actual debajo del rosco (sin la
+   respuesta); la tecla `D` la oculta/muestra.
 5. Hay **2:30** en el reloj. Al marcar, la respuesta del conductor se pinta verde/roja y
    se pasa a la siguiente letra pendiente.
 6. Al terminar, ambas ventanas muestran el resumen y el puntaje queda en la
