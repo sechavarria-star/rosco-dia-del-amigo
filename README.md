@@ -1,7 +1,7 @@
-# El Rosco de la Amistad · HP Argentina
+# Rosco HP · Día del Amigo
 
-Juego estilo **Pasapalabra** para el **Día del Amigo** de HP, con temática de amistad y
-alusiones al **9 de Julio** (Día de la Independencia argentina).
+Juego estilo **Pasapalabra** para el **Día del Amigo** de HP Argentina, con temática
+100% de amistad.
 
 ## Cómo se juega (modo evento, dos ventanas)
 
@@ -39,9 +39,10 @@ Pasos:
 
 ## Contenido
 
-- Dos roscos completos de 27 letras (A–Z con Ñ) definidos en `const ROSCOS` dentro de
-  `index.html`: **Rosco Celeste** y **Rosco Blanco**. Cada segundo jugador puede usar el
-  otro rosco para que no se sepan las respuestas.
+- **Cinco roscos completos** de 27 letras (A–Z con Ñ) definidos en `const ROSCOS` dentro
+  de `index.html` (**Rosco 1** a **Rosco 5**): uno distinto para cada equipo, así ningún
+  equipo escucha las respuestas del suyo antes de jugar. En la pantalla de inicio, los
+  roscos ya jugados quedan marcados con "ya jugado".
 - Para editar definiciones basta modificar ese array (campos: `l` letra, `t`
   `empieza`/`contiene`, `d` definición, `r` respuesta).
 

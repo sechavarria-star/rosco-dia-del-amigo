@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Rosco de la Amistad · HP Argentina</title>
+<title>Rosco HP · Día del Amigo</title>
 <style>
   :root{
     --hp-blue:#024AD8;
@@ -51,8 +51,8 @@
   .flag-chip .sun{color:#f5b301;}
   .flag-stripe{
     height:6px;width:100%;
-    background:linear-gradient(90deg,var(--celeste) 0 33%,#fff 33% 66%,var(--celeste) 66% 100%);
-    opacity:.85;
+    background:linear-gradient(90deg,var(--hp-blue) 0 45%,var(--hp-storm) 45% 70%,var(--hp-coral) 70% 100%);
+    opacity:.9;
   }
 
   /* ===== Screens ===== */
@@ -77,7 +77,9 @@
     background:#0a153c;color:var(--ink);font-size:16px;outline:none;
   }
   input[type=text]:focus{border-color:var(--hp-blue);box-shadow:0 0 0 3px rgba(2,74,216,.3);}
-  .set-picker{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .set-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px;}
+  .set-opt.played{opacity:.55;}
+  .set-opt.played b::after{content:" · ya jugado";color:var(--pass);font-size:11px;font-weight:600;}
   .set-opt{
     border:2px solid rgba(117,170,219,.35);border-radius:14px;padding:14px;cursor:pointer;
     background:#0a153c;transition:.15s;
@@ -270,10 +272,10 @@
 <header>
   <div class="logo-badge"><img src="assets/hp-logo.png" alt="HP"></div>
   <div class="titles">
-    <h1>El Rosco de la <em>Amistad</em></h1>
-    <p>Especial Día del Amigo · Edición 9 de Julio · HP Argentina</p>
+    <h1>Rosco <em>HP</em></h1>
+    <p>Especial Día del Amigo · HP Argentina</p>
   </div>
-  <div class="flag-chip"><span class="sun">☀</span> 9 de Julio · Día de la Independencia 🇦🇷</div>
+  <div class="flag-chip">💙 Feliz Día del Amigo</div>
 </header>
 <div class="flag-stripe"></div>
 
@@ -285,17 +287,29 @@
       <p class="sub">Estilo Pasapalabra: se proyecta el rosco, el conductor lee las definiciones y el jugador (o equipo) responde de viva voz. El conductor marca <b style="color:var(--ok)">acierto</b>, <b style="color:var(--bad)">error</b> o <b style="color:var(--pass)">pasapalabra</b>. Hay <b>2:30</b> en el reloj.</p>
 
       <label>Jugador / equipo</label>
-      <input type="text" id="playerName" placeholder="Ej.: Los Próceres de la Amistad" maxlength="40" autocomplete="off">
+      <input type="text" id="playerName" placeholder="Ej.: Los Cracks del 3er Piso" maxlength="40" autocomplete="off">
 
-      <label>Elegí el rosco</label>
+      <label>Elegí el rosco (uno distinto por equipo)</label>
       <div class="set-picker" id="setPicker">
         <div class="set-opt sel" data-set="0">
-          <b>🩵 Rosco Celeste</b>
-          <span>Amistad, mates, locro y la Declaración de la Independencia.</span>
+          <b>1️⃣ Rosco 1</b>
+          <span>Amistad, mate, karaoke y picada.</span>
         </div>
         <div class="set-opt" data-set="1">
-          <b>🤍 Rosco Blanco</b>
-          <span>Otras 27 palabras: asado, escarapela, truco y amigos de la vida.</span>
+          <b>2️⃣ Rosco 2</b>
+          <span>Asado, fútbol, química y reencuentro.</span>
+        </div>
+        <div class="set-opt" data-set="2">
+          <b>3️⃣ Rosco 3</b>
+          <span>Alfajor, fogón, sobremesa y zapada.</span>
+        </div>
+        <div class="set-opt" data-set="3">
+          <b>4️⃣ Rosco 4</b>
+          <span>Anécdota, fernet, boliche y leyenda.</span>
+        </div>
+        <div class="set-opt" data-set="4">
+          <b>5️⃣ Rosco 5</b>
+          <span>Aventura, café, pacto y videollamada.</span>
         </div>
       </div>
 
@@ -367,7 +381,7 @@
 <!-- ================= WAIT (pantalla del público) ================= -->
 <section id="wait" class="screen">
   <div class="wrap">
-    <h2>🇦🇷 El Rosco de la Amistad</h2>
+    <h2>💙 Rosco HP</h2>
     <p>El juego está por comenzar…</p>
   </div>
 </section>
@@ -407,63 +421,150 @@
    tipo: "empieza" | "contiene"
    ========================================================= */
 const ROSCOS = [
- { nombre:"Rosco Celeste", letras:[
+ { nombre:"Rosco 1", letras:[
   {l:"A",t:"empieza", d:"Vínculo de cariño y confianza entre personas que se eligen mutuamente.", r:"AMISTAD"},
-  {l:"B",t:"empieza", d:"Levantar la copa y chocarla con amigos para celebrar, por ejemplo, el Día del Amigo.", r:"BRINDIS"},
+  {l:"B",t:"empieza", d:"Levantar la copa y chocarla con amigos para celebrar.", r:"BRINDIS"},
   {l:"C",t:"empieza", d:"Lo que un buen amigo nunca traiciona: la seguridad de que se puede contar con él.", r:"CONFIANZA"},
-  {l:"D",t:"empieza", d:"La de la Independencia argentina se firmó un 9 de julio de 1816.", r:"DECLARACIÓN"},
-  {l:"E",t:"empieza", d:"Comida típica infaltable en toda celebración patria; puede ser de carne, pollo o humita.", r:"EMPANADA"},
-  {l:"F",t:"empieza", d:"Día no laborable, como cada 9 de julio en Argentina.", r:"FERIADO"},
+  {l:"D",t:"empieza", d:"Primera comida del día; compartirla con amigos arranca bien la mañana.", r:"DESAYUNO"},
+  {l:"E",t:"empieza", d:"Grupo de personas que trabaja unido por un mismo objetivo.", r:"EQUIPO"},
+  {l:"F",t:"empieza", d:"Celebración con música, comida y amigos.", r:"FIESTA"},
   {l:"G",t:"empieza", d:"Conjunto de amigos; el de WhatsApp no para de sonar nunca.", r:"GRUPO"},
-  {l:"H",t:"empieza", d:"Canción patria que los argentinos cantan con la mano en el corazón.", r:"HIMNO"},
-  {l:"I",t:"empieza", d:"Lo que Argentina declaró en San Miguel de Tucumán en 1816.", r:"INDEPENDENCIA"},
+  {l:"H",t:"empieza", d:"Sentido imprescindible para sobrevivir a las cargadas de los amigos.", r:"HUMOR"},
+  {l:"I",t:"empieza", d:"Mensaje que llega antes de toda juntada que se precie.", r:"INVITACIÓN"},
   {l:"J",t:"empieza", d:"Reunión informal de amigos para comer, charlar y ponerse al día.", r:"JUNTADA"},
   {l:"K",t:"empieza", d:"Actividad de cantar éxitos con micrófono entre amigos, aunque se desafine.", r:"KARAOKE"},
-  {l:"L",t:"empieza", d:"Guiso criollo a base de maíz y zapallo que se come en las fiestas patrias.", r:"LOCRO"},
+  {l:"L",t:"empieza", d:"Valor del amigo que siempre está, en las buenas y en las malas.", r:"LEALTAD"},
   {l:"M",t:"empieza", d:"Infusión que se comparte en ronda y es símbolo de la amistad argentina.", r:"MATE"},
-  {l:"N",t:"empieza", d:"Día del mes de julio en que se celebra la Independencia argentina.", r:"NUEVE"},
+  {l:"N",t:"empieza", d:"Momento del día en que las charlas con amigos se ponen más profundas.", r:"NOCHE"},
   {l:"Ñ",t:"contiene",d:"Persona con la que se comparte el día a día del trabajo o del estudio.", r:"COMPAÑERO"},
   {l:"O",t:"empieza", d:"Lugar de trabajo donde nacen muchas grandes amistades.", r:"OFICINA"},
-  {l:"P",t:"empieza", d:"Tierra donde uno nace; a la argentina se la celebra cada 9 de julio.", r:"PATRIA"},
-  {l:"Q",t:"empieza", d:"Infaltable en toda picada entre amigos; puede venir en cubitos con salamín.", r:"QUESO"},
+  {l:"P",t:"empieza", d:"Tabla de fiambres y quesos que se comparte entre amigos.", r:"PICADA"},
+  {l:"Q",t:"empieza", d:"Infaltable en toda picada; puede venir en cubitos con salamín.", r:"QUESO"},
   {l:"R",t:"empieza", d:"Lo que un buen amigo garantiza con un solo chiste interno.", r:"RISA"},
-  {l:"S",t:"empieza", d:"Figura dorada que brilla en el centro de la bandera argentina.", r:"SOL"},
-  {l:"T",t:"empieza", d:"Provincia donde se declaró la Independencia el 9 de julio de 1816.", r:"TUCUMÁN"},
+  {l:"S",t:"empieza", d:"Fiesta que se organiza a escondidas del cumpleañero.", r:"SORPRESA"},
+  {l:"T",t:"empieza", d:"Juego de cartas argentino donde mentirle al rival es parte del arte.", r:"TRUCO"},
   {l:"U",t:"empieza", d:"Lo que celebra el Día del Amigo: estar juntos aunque pase el tiempo.", r:"UNIÓN"},
-  {l:"V",t:"empieza", d:"Bebida clásica del brindis; la insignia nacional es el malbec.", r:"VINO"},
+  {l:"V",t:"empieza", d:"Plan soñado de todo grupo de amigos, aunque cueste ponerle fecha.", r:"VIAJE"},
   {l:"W",t:"empieza", d:"Aplicación donde vive el grupo de amigos y sus audios de diez minutos.", r:"WHATSAPP"},
   {l:"X",t:"contiene",d:"Resultado feliz de un proyecto encarado en equipo.", r:"ÉXITO"},
   {l:"Y",t:"empieza", d:"Lo que se da de más, de regalo, como el alfajor extra que te convida un amigo.", r:"YAPA"},
   {l:"Z",t:"contiene",d:"Gesto de cariño que se da con los dos brazos al reencontrarse con un amigo.", r:"ABRAZO"},
  ]},
- { nombre:"Rosco Blanco", letras:[
+ { nombre:"Rosco 2", letras:[
   {l:"A",t:"empieza", d:"Comida que une a los argentinos alrededor de la parrilla un domingo.", r:"ASADO"},
-  {l:"B",t:"empieza", d:"La argentina es celeste y blanca y fue creada por Manuel Belgrano.", r:"BANDERA"},
+  {l:"B",t:"empieza", d:"Forma cariñosa de llamar a la cerveza que se comparte a la salida del trabajo.", r:"BIRRA"},
   {l:"C",t:"empieza", d:"Amigo al que se le confían los secretos más guardados.", r:"CONFIDENTE"},
   {l:"D",t:"empieza", d:"Lo que nunca falta cuando se junta un buen grupo de amigos.", r:"DIVERSIÓN"},
-  {l:"E",t:"empieza", d:"Distintivo celeste y blanco que se prende en el pecho en las fechas patrias.", r:"ESCARAPELA"},
+  {l:"E",t:"empieza", d:"Comida que se pide por docena cuando los amigos caen de sorpresa.", r:"EMPANADA"},
   {l:"F",t:"empieza", d:"Deporte que junta amigos todas las semanas, aunque el equipo pierda siempre.", r:"FÚTBOL"},
   {l:"G",t:"empieza", d:"Instrumento infaltable en todo fogón entre amigos.", r:"GUITARRA"},
   {l:"H",t:"empieza", d:"Se dice del amigo que es \"de la vida\": uno que se vuelve familia.", r:"HERMANO"},
   {l:"I",t:"empieza", d:"Se dice de los amigos que van juntos a todas partes.", r:"INSEPARABLES"},
-  {l:"J",t:"empieza", d:"Mes del año en que se celebran la Independencia y el Día del Amigo.", r:"JULIO"},
+  {l:"J",t:"empieza", d:"Mes del año en que se celebra el Día del Amigo en Argentina.", r:"JULIO"},
   {l:"K",t:"empieza", d:"Comercio de barrio donde se compran los alfajores para compartir.", r:"KIOSCO"},
-  {l:"L",t:"empieza", d:"Valor del amigo que siempre está, en las buenas y en las malas.", r:"LEALTAD"},
+  {l:"L",t:"empieza", d:"Vínculo que une a dos personas; el de la amistad es de los más fuertes.", r:"LAZO"},
   {l:"M",t:"empieza", d:"Factura en forma de luna que un buen amigo trae al desayuno.", r:"MEDIALUNA"},
   {l:"N",t:"empieza", d:"Sentimiento que despiertan las fotos viejas con amigos.", r:"NOSTALGIA"},
-  {l:"Ñ",t:"contiene",d:"Reunión folclórica con guitarra, canto y empanadas.", r:"PEÑA"},
-  {l:"O",t:"empieza", d:"Monumento porteño ubicado sobre la avenida más ancha del mundo, la 9 de Julio.", r:"OBELISCO"},
-  {l:"P",t:"empieza", d:"Tabla de fiambres y quesos que se comparte entre amigos.", r:"PICADA"},
+  {l:"Ñ",t:"contiene",d:"Festejo anual en el que los amigos no pueden faltar: hay torta y velitas.", r:"CUMPLEAÑOS"},
+  {l:"O",t:"empieza", d:"La que presta un amigo cuando necesitás desahogarte.", r:"OREJA"},
+  {l:"P",t:"empieza", d:"Comida redonda que se corta en porciones y resuelve cualquier juntada.", r:"PIZZA"},
   {l:"Q",t:"empieza", d:"Lo que hay entre dos amigos que se entienden sin hablar.", r:"QUÍMICA"},
   {l:"R",t:"empieza", d:"Encuentro con amigos que hacía mucho tiempo no se veían.", r:"REENCUENTRO"},
   {l:"S",t:"empieza", d:"Lo que se le cuenta a un amigo y no puede salir de ahí.", r:"SECRETO"},
-  {l:"T",t:"empieza", d:"Juego de cartas bien argentino en el que mentir vale... ¡quiero retruco!", r:"TRUCO"},
+  {l:"T",t:"empieza", d:"Dicen que una charla larga con un amigo equivale a una sesión de esto.", r:"TERAPIA"},
   {l:"U",t:"empieza", d:"Etapa de estudio en la que se hacen amigos para toda la vida.", r:"UNIVERSIDAD"},
-  {l:"V",t:"empieza", d:"Plan soñado de todo grupo de amigos, aunque cueste ponerle fecha.", r:"VIAJE"},
+  {l:"V",t:"empieza", d:"Aperitivo clásico de la previa con amigos, con soda y hielo.", r:"VERMUT"},
   {l:"W",t:"contiene",d:"El de miga es infaltable en los cumpleaños de la oficina.", r:"SÁNDWICH"},
   {l:"X",t:"contiene",d:"Salida en grupo para pasar el día al aire libre.", r:"EXCURSIÓN"},
-  {l:"Y",t:"contiene",d:"Cantor criollo que improvisa versos con su guitarra.", r:"PAYADOR"},
+  {l:"Y",t:"empieza", d:"Sin ella no hay mate: se compra en paquete de un kilo.", r:"YERBA"},
   {l:"Z",t:"contiene",d:"Ahí es donde, dicen, se guardan los amigos de verdad.", r:"CORAZÓN"},
+ ]},
+ { nombre:"Rosco 3", letras:[
+  {l:"A",t:"empieza", d:"Golosina argentina de dos tapas y dulce de leche que se convida entre amigos.", r:"ALFAJOR"},
+  {l:"B",t:"empieza", d:"Lugar donde se hacen los primeros amigos de la vida.", r:"BARRIO"},
+  {l:"C",t:"empieza", d:"Relato corto que busca hacer reír; los internos solo los entiende el grupo.", r:"CHISTE"},
+  {l:"D",t:"empieza", d:"Día de la semana clásico para el asado con amigos y familia.", r:"DOMINGO"},
+  {l:"E",t:"empieza", d:"Lo que hace un buen amigo cuando necesitás hablar.", r:"ESCUCHAR"},
+  {l:"F",t:"empieza", d:"Fuego alrededor del cual los amigos cantan y cuentan historias en un campamento.", r:"FOGÓN"},
+  {l:"G",t:"empieza", d:"Virtud del que comparte lo que tiene sin esperar nada a cambio.", r:"GENEROSIDAD"},
+  {l:"H",t:"empieza", d:"Grupo que alienta a su equipo desde la tribuna, todos juntos.", r:"HINCHADA"},
+  {l:"I",t:"empieza", d:"Etapa de la vida en la que se hacen los amigos del barrio y la escuela.", r:"INFANCIA"},
+  {l:"J",t:"empieza", d:"El de mesa desata peleas amistosas en toda juntada: el TEG, por ejemplo.", r:"JUEGO"},
+  {l:"K",t:"empieza", d:"Los que un amigo de verdad maneja con tal de ir a verte.", r:"KILÓMETRO"},
+  {l:"L",t:"empieza", d:"La que un amigo atiende a cualquier hora, incluso a las 3 de la mañana.", r:"LLAMADA"},
+  {l:"M",t:"empieza", d:"Comida de la tarde con café, té o mate y facturas compartidas.", r:"MERIENDA"},
+  {l:"N",t:"empieza", d:"La buena se comparte primero con los amigos.", r:"NOTICIA"},
+  {l:"Ñ",t:"contiene",d:"Los que cumplen las buenas amistades sin perder fuerza.", r:"AÑOS"},
+  {l:"O",t:"empieza", d:"Idea graciosa e inesperada, típica del amigo payaso del grupo.", r:"OCURRENCIA"},
+  {l:"P",t:"empieza", d:"Reunión con amigos antes de salir; a veces es mejor que la salida misma.", r:"PREVIA"},
+  {l:"Q",t:"empieza", d:"Espacio techado con parrilla donde se hacen los mejores festejos.", r:"QUINCHO"},
+  {l:"R",t:"empieza", d:"La del mate: orden sagrado que no se puede saltear.", r:"RONDA"},
+  {l:"S",t:"empieza", d:"Charla que sigue después de comer, cuando nadie se quiere levantar de la mesa.", r:"SOBREMESA"},
+  {l:"T",t:"empieza", d:"La del cumpleaños llega con velitas y el feliz cumpleaños cantado.", r:"TORTA"},
+  {l:"U",t:"empieza", d:"Así están los amigos de verdad, en las buenas y en las malas.", r:"UNIDOS"},
+  {l:"V",t:"empieza", d:"Lo que un amigo te dice de frente, aunque duela.", r:"VERDAD"},
+  {l:"W",t:"empieza", d:"Lo primero que se pide al llegar a una casa ajena: la clave de esta red.", r:"WIFI"},
+  {l:"X",t:"contiene",d:"Lo que se acumula viviendo aventuras con amigos.", r:"EXPERIENCIA"},
+  {l:"Y",t:"contiene",d:"Destino clásico del primer viaje con amigos.", r:"PLAYA"},
+  {l:"Z",t:"empieza", d:"Sesión improvisada de música entre amigos con guitarra.", r:"ZAPADA"},
+ ]},
+ { nombre:"Rosco 4", letras:[
+  {l:"A",t:"empieza", d:"Historia que el grupo cuenta mil veces y siempre vuelve a hacer reír.", r:"ANÉCDOTA"},
+  {l:"B",t:"empieza", d:"Lugar bailable donde el grupo termina la noche.", r:"BOLICHE"},
+  {l:"C",t:"empieza", d:"Salida con carpa y fogón, clásico de la amistad adolescente.", r:"CAMPAMENTO"},
+  {l:"D",t:"empieza", d:"Fiesta que se organiza cuando un amigo se va a vivir lejos.", r:"DESPEDIDA"},
+  {l:"E",t:"empieza", d:"Viaje corto de fin de semana que los amigos arman de un día para otro.", r:"ESCAPADA"},
+  {l:"F",t:"empieza", d:"Bebida amarga que en Argentina se toma con cola y con amigos.", r:"FERNET"},
+  {l:"G",t:"empieza", d:"Detalle que demuestra cariño sin necesidad de palabras.", r:"GESTO"},
+  {l:"H",t:"empieza", d:"Cada grupo de amigos tiene la suya, llena de capítulos inolvidables.", r:"HISTORIA"},
+  {l:"I",t:"empieza", d:"Se dice del amigo que no se pierde ninguna juntada.", r:"INFALTABLE"},
+  {l:"J",t:"empieza", d:"Forma bien argentina de llamar a la fiesta o a la broma.", r:"JODA"},
+  {l:"K",t:"contiene",d:"Música que suena fuerte en los recitales a los que se va en banda.", r:"ROCK"},
+  {l:"L",t:"empieza", d:"Día de la semana que se hace más liviano contándole el finde a un compañero.", r:"LUNES"},
+  {l:"M",t:"empieza", d:"El de \"¿llegaste bien?\" que manda un amigo después de la juntada.", r:"MENSAJE"},
+  {l:"N",t:"empieza", d:"El del grupo de WhatsApp: cambia cada semana y nadie sabe por qué.", r:"NOMBRE"},
+  {l:"Ñ",t:"contiene",d:"La que se hacen dos amigos con la mirada para irse de una fiesta.", r:"SEÑAL"},
+  {l:"O",t:"empieza", d:"Buena ___: la que le ponen los amigos a cualquier plan, aunque salga mal.", r:"ONDA"},
+  {l:"P",t:"empieza", d:"Donde se cocinan los chorizos mientras todos opinan cómo hacerlo mejor.", r:"PARRILLA"},
+  {l:"Q",t:"empieza", d:"Sentir afecto por alguien; a los amigos se los... sin condiciones.", r:"QUERER"},
+  {l:"R",t:"empieza", d:"Lo que queda de cada aventura compartida.", r:"RECUERDO"},
+  {l:"S",t:"empieza", d:"Plan nocturno del grupo: cena, cine o lo que surja.", r:"SALIDA"},
+  {l:"T",t:"empieza", d:"Sándwich caliente de jamón y queso, clásico del café con un amigo.", r:"TOSTADO"},
+  {l:"U",t:"empieza", d:"Como cada amigo: no hay dos iguales.", r:"ÚNICO"},
+  {l:"V",t:"empieza", d:"Día de la semana favorito para el after office.", r:"VIERNES"},
+  {l:"W",t:"contiene",d:"Juego de bolos al que se va en grupo y siempre gana el menos pensado.", r:"BOWLING"},
+  {l:"X",t:"contiene",d:"Prueba que se estudia mejor con un compañero.", r:"EXAMEN"},
+  {l:"Y",t:"contiene",d:"En eso se convierten las historias del grupo con los años.", r:"LEYENDA"},
+  {l:"Z",t:"contiene",d:"Intuición que te dice que esa persona va a ser tu amiga para siempre.", r:"CORAZONADA"},
+ ]},
+ { nombre:"Rosco 5", letras:[
+  {l:"A",t:"empieza", d:"Lo que se vive cuando el plan con amigos se va de guion.", r:"AVENTURA"},
+  {l:"B",t:"empieza", d:"Forma de llamar al grupo de amigos que va a todos lados junto.", r:"BANDA"},
+  {l:"C",t:"empieza", d:"Excusa líquida para ponerse al día con alguien querido.", r:"CAFÉ"},
+  {l:"D",t:"empieza", d:"Pequeño gesto que demuestra que un amigo se acordó de vos.", r:"DETALLE"},
+  {l:"E",t:"empieza", d:"Lugar donde se conocen los amigos de toda la vida.", r:"ESCUELA"},
+  {l:"F",t:"empieza", d:"Masa dulce de panadería que se compra por docena para compartir.", r:"FACTURA"},
+  {l:"G",t:"empieza", d:"Palabra que nunca sobra entre amigos.", r:"GRACIAS"},
+  {l:"H",t:"empieza", d:"Lo que se siente la casa de un amigo cuando te reciben bien.", r:"HOGAR"},
+  {l:"I",t:"empieza", d:"Estación del año del Día del Amigo en Argentina, ideal para juntarse adentro.", r:"INVIERNO"},
+  {l:"J",t:"empieza", d:"El de infantes: donde se hacen los primeros amiguitos, entre juegos y meriendas.", r:"JARDÍN"},
+  {l:"K",t:"empieza", d:"Carrera entre amigos donde se define quién maneja mejor (o eso creen).", r:"KARTING"},
+  {l:"L",t:"empieza", d:"La de invitados, la de canciones o la de compras: siempre la arma el organizado del grupo.", r:"LISTA"},
+  {l:"M",t:"empieza", d:"No hay juntada sin ella; el que la elige tiene una gran responsabilidad.", r:"MÚSICA"},
+  {l:"N",t:"empieza", d:"El de teléfono: lo primero que se intercambia con un amigo nuevo.", r:"NÚMERO"},
+  {l:"Ñ",t:"contiene",d:"La del domingo: momento en que el grupo reconstruye la noche anterior.", r:"MAÑANA"},
+  {l:"O",t:"empieza", d:"El amigo que arma el plan, reserva, paga y encima divide la cuenta.", r:"ORGANIZADOR"},
+  {l:"P",t:"empieza", d:"Acuerdo secreto que sella una amistad para siempre.", r:"PACTO"},
+  {l:"Q",t:"empieza", d:"Casa con parque y pileta donde se hacen los asados de verano.", r:"QUINTA"},
+  {l:"R",t:"empieza", d:"Lo que se lleva al cumpleaños, aunque el mejor es la presencia.", r:"REGALO"},
+  {l:"S",t:"empieza", d:"Lo primero que aparece al ver llegar a un amigo.", r:"SONRISA"},
+  {l:"T",t:"empieza", d:"\"Más vale ___ que nunca\": lema del impuntual del grupo.", r:"TARDE"},
+  {l:"U",t:"empieza", d:"Juego de cartas de colores que termina amistades... y las vuelve a empezar.", r:"UNO"},
+  {l:"V",t:"empieza", d:"La que salva la amistad cuando un amigo se muda lejos.", r:"VIDEOLLAMADA"},
+  {l:"W",t:"contiene",d:"Pizza con ananá que divide al grupo en dos bandos irreconciliables.", r:"HAWAIANA"},
+  {l:"X",t:"contiene",d:"Lo que se siente cuando un amigo está lejos.", r:"EXTRAÑAR"},
+  {l:"Y",t:"contiene",d:"Lo que da un amigo en los momentos difíciles.", r:"APOYO"},
+  {l:"Z",t:"contiene",d:"Puntaje que se lleva un amigo que siempre está.", r:"DIEZ"},
  ]},
 ];
 
@@ -664,9 +765,9 @@ function endGame(titulo){
   if(ok>=15) confetti();
 }
 function mensajeFinal(ok,bad,pend){
-  if(ok===27) return "🏆 ¡ROSCO PERFECTO! 27 de 27. Ni los congresales de Tucumán firmaron algo tan grande. 🇦🇷";
-  if(ok>=20) return "🥇 ¡Enorme! Un verdadero prócer de la amistad. ¡Feliz Día del Amigo!";
-  if(ok>=13) return "👏 ¡Muy buen rosco! Con amigos así, la patria está en buenas manos.";
+  if(ok===27) return "🏆 ¡ROSCO PERFECTO! 27 de 27. Este equipo pasa directo a la leyenda del Día del Amigo. 💙";
+  if(ok>=20) return "🥇 ¡Enorme! Un equipo de verdaderos cracks. ¡Feliz Día del Amigo!";
+  if(ok>=13) return "👏 ¡Muy buen rosco! Se nota que este grupo se conoce de memoria.";
   if(ok>=7)  return "🙂 Digno esfuerzo. La próxima juntada lo charlamos con un mate de por medio.";
   return "😅 Lo importante no era ganar, era jugar con amigos... ¿otra vuelta?";
 }
@@ -684,6 +785,9 @@ function renderRanking(){
   let rk = [];
   try{ rk = JSON.parse(localStorage.getItem(RK_KEY)||"[]"); }catch(e){}
   rk.sort((a,b)=> b.ok-a.ok || a.bad-b.bad || b.time-a.time);
+  document.querySelectorAll(".set-opt").forEach(o=>{
+    o.classList.toggle("played", rk.some(r=>r.set===ROSCOS[+o.dataset.set].nombre));
+  });
   const el = $("rankingBody");
   if(!rk.length){ el.innerHTML = '<div class="empty-rk">Todavía no jugó nadie. ¡Sé el primero! 🚀</div>'; return; }
   const rows = rk.slice(0,8).map((r,i)=>
